@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # 1. Клонируем репозиторий
+    # 1. Клонируем репозиторий (ОБНОВЛЕНО до v4)
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     # 2. Устанавливаем Python
     - name: Set up Python 3.10
@@ -23,35 +23,21 @@ jobs:
       with:
         python-version: '3.10'
     
-    # 3. Устанавливаем Chrome и ChromeDriver
-    - name: Install Chrome and ChromeDriver
+    # 3. Устанавливаем Chrome и ChromeDriver (УПРОЩЕНО - используем готовый Chrome)
+    - name: Install Chrome
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget unzip
-        
-        # Устанавливаем Chrome
-        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-        sudo apt-get update
+        # Устанавливаем Chrome из стандартных репозиториев (уже есть в образе)
         sudo apt-get install -y google-chrome-stable
-        
-        # Устанавливаем ChromeDriver
-        CHROME_VERSION=$(google-chrome --version | cut -d ' ' -f 3)
-        CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}")
-        wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        
-        # Проверяем версии
         google-chrome --version
-        chromedriver --version
     
     # 4. Устанавливаем зависимости Python
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        # Дополнительные зависимости для Chrome
+        pip install webdriver-manager
     
     # 5. Запускаем тесты
     - name: Run tests with pytest
@@ -62,10 +48,10 @@ jobs:
         # С генерацией HTML отчета
         pytest test_lab3.py -v --html=test-report.html --self-contained-html
     
-    # 6. Загружаем артефакты (отчеты)
+    # 6. Загружаем артефакты (отчеты) (ОБНОВЛЕНО до v4)
     - name: Upload test reports
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-reports
         path: |
