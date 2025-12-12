@@ -57,4 +57,4 @@ def test_login_success(driver):
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--html=report.html", "--self-contained-html"])s
+    pytest.main([__file__, "-v", "--html=report.html", "--self-contained-html"])
